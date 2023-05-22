@@ -64,4 +64,29 @@ menteeController.deleteMentee = (req, res) => {
   });
 };
 
+menteeController.loginMentee = (req, res) => {
+  const { email, password } = req.body;
+  Mentee.getByEmailAndPassword(email, password, (err, mentee) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (!mentee) {
+      res.status(401).json({ message: 'Email atau password salah' });
+    } else {
+      res.json({ code: '200', status: 'OK', mentee });
+    }
+  });
+};
+
+menteeController.registerMentee = (req, res) => {
+  const data = req.body;
+  Mentee.create(data, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ message: 'Mentee register successfully' });
+    }
+  });
+};
+
+
 module.exports = menteeController;

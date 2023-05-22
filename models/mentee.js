@@ -23,4 +23,12 @@ Mentee.delete = (id, callback) => {
   connection.query('DELETE FROM mentee WHERE id = ?', [id], callback);
 };
 
+Mentee.getByEmailAndPassword = (email, password, callback) => {
+  connection.query('SELECT * FROM mentee WHERE email = ? AND password = ?', [email, password], callback);
+};
+
+Mentee.register = (data, callback) => {
+  connection.query('INSERT INTO mentee SET ?', data, callback);
+};
+
 module.exports = Mentee;

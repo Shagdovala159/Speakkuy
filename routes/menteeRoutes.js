@@ -15,7 +15,7 @@ router.post('/', menteeController.createMentee);
 router.put('/:id', menteeController.updateMentee);
 router.delete('/:id', menteeController.deleteMentee);
 
-
-
+router.post('/login', menteeController.loginMentee);
+router.post('/register', menteeController.registerMentee);
 
 module.exports = router;
