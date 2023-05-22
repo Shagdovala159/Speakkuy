@@ -69,13 +69,14 @@ menteeController.deleteMentee = (req, res) => {
 menteeController.loginMentee = (req, res) => {
   const { email, password } = req.body;
 
-  Mentee.getByEmailAndPassword(email, password, (err, mentee) => {
+  Mentee.getByEmailAndPassword(email, password, (err, data) => {
     if (err) {
       res.status(500).json({ status: 'Error', error: err.message });
-    } else if (!mentee) {
+    } else if (!data) {
       res.status(401).json({ status: 'Error', message: 'Email atau password salah' });
     } else {
-      res.json({ status: 'OK', message: 'Login berhasil', mentee});
+      res.json({ code: 200 ,status: 'OK'});
+      //res.json({ status: 'OK', message: 'Login berhasil', data);
     }
   });
 };
@@ -84,14 +85,15 @@ menteeController.loginMentee = (req, res) => {
 menteeController.loginMenteeAuth = (req, res) => {
   const { email, password } = req.body;
 
-  Mentee.getByEmailAndPassword(email, password, (err, mentee) => {
+  Mentee.getByEmailAndPassword(email, password, (err, data) => {
     if (err) {
       res.status(500).json({ status: 'Error', error: err.message });
-    } else if (!mentee) {
+    } else if (!data) {
       res.status(401).json({ status: 'Error', message: 'Email atau password salah' });
     } else {
-      const token = jwt.sign({ mentee }, "rahasia", { expiresIn: '20s' });
-      res.json({ status: 'OK', message: 'Login berhasil', mentee, token});
+      const token = jwt.sign({ data }, "rahasia", { expiresIn: '40s' });
+      res.json({ code: 200 ,status: 'OK', token});
+      //res.json({ status: 'OK', message: 'Login berhasil', data, token});
     }
   });
 };

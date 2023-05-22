@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 function authenticateToken(req, res, next) {
-    const token = req.headers.authorization.split(' ')[1];
+  const token = req.headers.authorization.split(' ')[1];
 
   if (!token) {
     return res.status(401).json({ error: 'Token tidak ditemukan' });
@@ -12,7 +12,7 @@ function authenticateToken(req, res, next) {
       return res.status(403).json({ error: 'Token tidak valid' });
     }
     if (decoded.id !== req.params.id) {
-      return res.status(403).json({ error: 'Akses ditolak' });
+      return res.status(403).json({ error: 'Akses ditolak', halo: decoded.mentee.id, param: req.params.id});
     }
 
     req.user = decoded;
