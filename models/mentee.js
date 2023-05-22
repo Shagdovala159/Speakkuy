@@ -24,11 +24,40 @@ Mentee.delete = (id, callback) => {
 };
 
 Mentee.getByEmailAndPassword = (email, password, callback) => {
-  connection.query('SELECT * FROM mentee WHERE email = ? AND password = ?', [email, password], callback);
+  const query = 'SELECT * FROM mentee WHERE email = ? AND password = ?';
+  const values = [email, password];
+  connection.query(query, values, (err, results) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    if (results.length === 0) {
+      callback(null, null);
+      return;
+    }
+    const mentee = results[0];
+    callback(null, mentee);
+  });
 };
 
-Mentee.register = (data, callback) => {
-  connection.query('INSERT INTO mentee SET ?', data, callback);
+
+Mentee.checkEmailExists = (email, callback) => {
+  const query = `SELECT COUNT(*) AS count FROM mentee WHERE email = ?`;
+  connection.query(query, [email], (err, results) => {
+    if (err) throw err;
+
+    const emailCount = results[0].count;
+    callback(emailCount > 0);
+  });
+};
+
+Mentee.addMentee  = (full_name, email, password, callback) => {
+  const query = `INSERT INTO mentee (full_name, email, password) VALUES (?, ?, ?)`;
+  connection.query(query, [full_name, email, password], (err, results) => {
+    if (err) throw err;
+
+    callback();
+  });
 };
 
 module.exports = Mentee;

@@ -1,5 +1,7 @@
 // controller/menteeController.js
 const Mentee = require('../models/mentee');
+const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 const menteeController = {};
 
@@ -66,27 +68,48 @@ menteeController.deleteMentee = (req, res) => {
 
 menteeController.loginMentee = (req, res) => {
   const { email, password } = req.body;
+
   Mentee.getByEmailAndPassword(email, password, (err, mentee) => {
     if (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ status: 'Error', error: err.message });
     } else if (!mentee) {
-      res.status(401).json({ message: 'Email atau password salah' });
+      res.status(401).json({ status: 'Error', message: 'Email atau password salah' });
     } else {
-      res.json({ code: '200', status: 'OK', mentee });
+      res.json({ status: 'OK', message: 'Login berhasil', mentee});
+    }
+  });
+};
+
+
+menteeController.loginMenteeAuth = (req, res) => {
+  const { email, password } = req.body;
+
+  Mentee.getByEmailAndPassword(email, password, (err, mentee) => {
+    if (err) {
+      res.status(500).json({ status: 'Error', error: err.message });
+    } else if (!mentee) {
+      res.status(401).json({ status: 'Error', message: 'Email atau password salah' });
+    } else {
+      const token = jwt.sign({ mentee }, "rahasia", { expiresIn: '20s' });
+      res.json({ status: 'OK', message: 'Login berhasil', mentee, token});
     }
   });
 };
 
 menteeController.registerMentee = (req, res) => {
-  const data = req.body;
-  Mentee.create(data, (err, result) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
+  const { full_name, email, password } = req.body;
+  Mentee.checkEmailExists(email, (emailExists) => {
+    if (emailExists) {
+      res.status(400).json({ message: 'Email sudah terdaftar' });
     } else {
-      res.json({ message: 'Mentee register successfully' });
+      Mentee.addMentee(full_name, email, password, () => {
+        res.status(200).json({ message: 'Mentee berhasil didaftarkan'});
+      });
     }
   });
 };
+
+
 
 
 module.exports = menteeController;
