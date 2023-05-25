@@ -91,7 +91,7 @@ menteeController.loginMenteeAuth = (req, res) => {
     } else if (!data) {
       res.status(401).json({ code: 201 ,status: 'Error', message: 'Wrong email or password'});
     } else {
-      const token = jwt.sign({ data }, "rahasia", { expiresIn: '1' });
+      const token = jwt.sign({ data }, "rahasia", { expiresIn: '5m' });
       res.json({ code: 200 ,status: 'OK', token});
       //res.json({ status: 'OK', message: 'Login berhasil', data, token});
     }
@@ -112,14 +112,16 @@ menteeController.registerMentee = (req, res) => {
 };
 //profile
 menteeController.me = (req, res) => {
-  const id = req.params.id;
-  Mentee.getById(id, (err, mentee) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const tokenData = jwt.decode(token);
+  const id = tokenData.data.id;
+  Mentee.megetById(id, (err, mentee) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else if (mentee) {
-      res.json(mentee);
+      res.json(mentee[0]);
     } else {
-      res.status(404).json({ message: 'Mentee not found' });
+      res.status(404).json({ code: 201 ,status: 'Error',message: 'Mentee not found' });
     }
   });
 };

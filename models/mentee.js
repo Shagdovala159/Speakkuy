@@ -8,7 +8,11 @@ Mentee.getAll = (callback) => {
 };
 
 Mentee.getById = (id, callback) => {
-  connection.query('SELECT * FROM mentee WHERE id = ?', [id], callback);
+  connection.query(
+    'SELECT full_name, email, phone_number, profile_picture FROM mentee WHERE id = ?',
+    [id],
+    callback
+  );
 };
 
 Mentee.create = (data, callback) => {
@@ -60,4 +64,11 @@ Mentee.addMentee  = (full_name, email, password, callback) => {
   });
 };
 
+Mentee.megetById = (id, callback) => {
+  connection.query(
+    'SELECT full_name, email, phone_number, profile_picture FROM mentee WHERE id = ?',
+    [id],
+    callback
+  );
+};
 module.exports = Mentee;

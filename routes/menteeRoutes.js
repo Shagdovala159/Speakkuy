@@ -15,9 +15,7 @@ router.post('/register', menteeController.registerMentee);
 router.post('/login', menteeController.loginMentee);
 router.post('/loginAuth', menteeController.loginMenteeAuth);
 //endpoint me (profile)
-router.get('/me',authmentee, menteeController.me);
-
-
+router.get('/me',authallmentee, menteeController.me);
 router.get('/all',authallmentee,menteeController.getAllMentee);
 router.get('/:id',authmentee, menteeController.getMenteeById);
 
