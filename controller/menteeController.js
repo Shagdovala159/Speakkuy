@@ -110,6 +110,17 @@ menteeController.registerMentee = (req, res) => {
     }
   });
 };
-
-
+//profile
+menteeController.me = (req, res) => {
+  const id = req.params.id;
+  Mentee.getById(id, (err, mentee) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (mentee) {
+      res.json(mentee);
+    } else {
+      res.status(404).json({ message: 'Mentee not found' });
+    }
+  });
+};
 module.exports = menteeController;
