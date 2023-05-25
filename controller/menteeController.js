@@ -89,9 +89,9 @@ menteeController.loginMenteeAuth = (req, res) => {
     if (err) {
       res.status(500).json({ status: 'Error', error: err.message });
     } else if (!data) {
-      res.status(401).json({ status: 'Error', message: 'Email atau password salah' });
+      res.status(401).json({ code: 201 ,status: 'Error', message: 'Wrong email or password'});
     } else {
-      const token = jwt.sign({ data }, "rahasia", { expiresIn: '40s' });
+      const token = jwt.sign({ data }, "rahasia", { expiresIn: '1' });
       res.json({ code: 200 ,status: 'OK', token});
       //res.json({ status: 'OK', message: 'Login berhasil', data, token});
     }
@@ -102,16 +102,14 @@ menteeController.registerMentee = (req, res) => {
   const { full_name, email, password } = req.body;
   Mentee.checkEmailExists(email, (emailExists) => {
     if (emailExists) {
-      res.status(400).json({ message: 'Email sudah terdaftar' });
+      res.status(400).json({code: 201 ,status: 'Error', message: 'Email already exits'});
     } else {
       Mentee.addMentee(full_name, email, password, () => {
-        res.status(200).json({ message: 'Mentee berhasil didaftarkan'});
+        res.status(200).json({ code: 201 ,status: 'Created'});
       });
     }
   });
 };
-
-
 
 
 module.exports = menteeController;

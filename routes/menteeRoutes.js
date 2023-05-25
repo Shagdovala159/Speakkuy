@@ -9,8 +9,9 @@ const authmentee = require('../middleware/authmentee');
 
 
 router.use(cors);
-
+//endpoint register
 router.post('/register', menteeController.registerMentee);
+//endpoint login
 router.post('/login', menteeController.loginMentee);
 router.post('/loginAuth', menteeController.loginMenteeAuth);
 
