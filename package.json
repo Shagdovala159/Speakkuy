@@ -2,10 +2,10 @@
   "name": "capstone",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "test": "nodemon server.js",
-    "start": "node server.js"
+    "test": "nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
