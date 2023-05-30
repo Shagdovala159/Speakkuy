@@ -1,10 +1,12 @@
 // routes/itemRoutes.js
 const express = require('express');
+const multer = require('multer');
 const menteeController = require('../controller/menteeController');
 const cors = require('../middleware/cors');
 const router = express.Router();
 const authallmentee = require('../middleware/authallmentee');
 const authmentee = require('../middleware/authmentee');
+const upload = multer({ dest: 'uploads/' });
 
 
 
@@ -14,8 +16,13 @@ router.post('/register', menteeController.registerMentee);
 //endpoint login
 router.post('/login', menteeController.loginMentee);
 router.post('/loginAuth', menteeController.loginMenteeAuth);
+//endpoint logout
+router.get('/logoutAuth',authallmentee, menteeController.logoutMenteeAuth);
 //endpoint me (profile)
 router.get('/me',authallmentee, menteeController.me);
+//endpoint update me (profile)
+router.put('/updateme',authallmentee,upload.single('photo'), menteeController.updateme);
+
 router.get('/all',authallmentee,menteeController.getAllMentee);
 router.get('/:id',authmentee, menteeController.getMenteeById);
 

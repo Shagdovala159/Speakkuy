@@ -71,4 +71,8 @@ Mentee.megetById = (id, callback) => {
     callback
   );
 };
+
+Mentee.UpdateMebyId = (id, data, callback) => {
+  connection.query('UPDATE mentee SET ? WHERE id = ?', [data, id], callback);
+};
 module.exports = Mentee;

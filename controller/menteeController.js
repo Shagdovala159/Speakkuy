@@ -1,5 +1,6 @@
 // controller/menteeController.js
 const Mentee = require('../models/mentee');
+const { storage, bucketName } = require('./storage');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
@@ -98,6 +99,22 @@ menteeController.loginMenteeAuth = (req, res) => {
   });
 };
 
+//logout
+menteeController.logoutMenteeAuth = (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const tokenData = jwt.decode(token);
+  const id = tokenData.data.id;
+  Mentee.megetById(id, (err, mentee) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (mentee) {
+      res.json(mentee[0]);
+    } else {
+      res.status(404).json({ code: 201 ,status: 'Error',message: 'Mentee not found' });
+    }
+  });
+};
+
 menteeController.registerMentee = (req, res) => {
   const { full_name, email, password } = req.body;
   Mentee.checkEmailExists(email, (emailExists) => {
@@ -125,4 +142,42 @@ menteeController.me = (req, res) => {
     }
   });
 };
+
+//updateprofile
+
+menteeController.updateme = (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const tokenData = jwt.decode(token);
+  const id = tokenData.data.id;
+  const data = req.body;
+  const photoFile = req.file;
+
+  let photoUrl = '';
+  if (photoFile) {
+    const filename = `${Date.now()}_${photoFile.originalname}`;
+    const file = storage.bucket(bucketName).file(filename);
+    
+    // Upload gambar ke Cloud Storage
+    file.save(photoFile.buffer, {
+      metadata: {
+        contentType: photoFile.mimetype,
+      },
+    });
+
+    // Dapatkan URL publik file yang diunggah
+    photoUrl = `https://storage.googleapis.com/${bucketName}/${filename}`;
+    data.profile_picture = photoUrl;
+  }
+
+  Mentee.UpdateMebyId(id, data, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (result.affectedRows === 0) {
+      res.status(404).json({ message: 'Mentee not found' });
+    } else {
+      res.json({ message: 'Mentee updated successfully' });
+    }
+  });
+};
+
 module.exports = menteeController;
