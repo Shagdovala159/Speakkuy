@@ -1,10 +1,9 @@
 // controller/menteeController.js
 const Mentee = require('../models/mentee');
-const { storage, bucketName } = require('./storage');
-const bcrypt = require('bcrypt');
+const { storage, bucketName } = require('../config/storage');
 const jwt = require("jsonwebtoken");
-
 const menteeController = {};
+const fs = require('fs');
 
 menteeController.getAllMentee = (req, res) => {
   Mentee.getAll((err, mentees) => {
@@ -122,7 +121,7 @@ menteeController.registerMentee = (req, res) => {
       res.status(400).json({code: 201 ,status: 'Error', message: 'Email already exits'});
     } else {
       Mentee.addMentee(full_name, email, password, () => {
-        res.status(200).json({ code: 201 ,status: 'Created'});
+        res.status(200).json({ code: 200 ,status: 'Created'});
       });
     }
   });
@@ -149,25 +148,27 @@ menteeController.updateme = (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
   const tokenData = jwt.decode(token);
   const id = tokenData.data.id;
-  const data = req.body;
-  const photoFile = req.file;
+   const data = req.body;
+  const photo = req.file;
 
+  const path = photo.destination + photo.filename
   let photoUrl = '';
-  if (photoFile) {
-    const filename = `${Date.now()}_${photoFile.originalname}`;
-    const file = storage.bucket(bucketName).file(filename);
-    
+  if (photo) {
     // Upload gambar ke Cloud Storage
-    file.save(photoFile.buffer, {
-      metadata: {
-        contentType: photoFile.mimetype,
-      },
-    });
-
     // Dapatkan URL publik file yang diunggah
-    photoUrl = `https://storage.googleapis.com/${bucketName}/${filename}`;
+    storage.bucket(bucketName).upload(path);
+    photoUrl = `https://storage.googleapis.com/${bucketName}/${photo.filename}`;
     data.profile_picture = photoUrl;
   }
+
+  process.nextTick(() => {
+    fs.unlink(path, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Gagal menghapus file');
+      }
+    });
+  });
 
   Mentee.UpdateMebyId(id, data, (err, result) => {
     if (err) {
@@ -175,7 +176,7 @@ menteeController.updateme = (req, res) => {
     } else if (result.affectedRows === 0) {
       res.status(404).json({ message: 'Mentee not found' });
     } else {
-      res.json({ message: 'Mentee updated successfully' });
+      res.status(200).json({ code: 200 ,status: 'OK'});
     }
   });
 };
